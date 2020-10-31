@@ -66,7 +66,7 @@ func (pool SQLReader) Read(ctx context.Context, query string, w CSVWriter) error
 		if err = rows.Scan(vals...); err != nil {
 			return err
 		}
-		if err := w.Write(vals); err != nil {
+		if err = w.Write(vals); err != nil {
 			return err
 		}
 	}

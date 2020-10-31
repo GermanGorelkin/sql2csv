@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	_ "github.com/denisenkom/go-mssqldb"
 	"github.com/germangorelkin/sql2csv"
-	"github.com/sirupsen/logrus"
 	"io/ioutil"
 	"log"
 	"os"
@@ -14,15 +13,15 @@ import (
 func main() {
 	queryFile := os.Getenv("QUERY_FILE")
 	if queryFile == "" {
-		logrus.Fatal("QUERY_FILE is not set.")
+		log.Fatal("QUERY_FILE is not set.")
 	}
 	outFile := os.Getenv("OUT_FILE")
 	if outFile == "" {
-		logrus.Fatal("OUT_FILE is not set.")
+		log.Fatal("OUT_FILE is not set.")
 	}
 	connDB := os.Getenv("DATABASE_URL")
 	if connDB == "" {
-		logrus.Fatal("DATABASE_URL is not set.")
+		log.Fatal("DATABASE_URL is not set.")
 	}
 
 	b, err := ioutil.ReadFile(queryFile)
@@ -53,5 +52,5 @@ func main() {
 		log.Fatal(err)
 	}
 
-	log.Print("finish!")
+	log.Println("export completed")
 }
