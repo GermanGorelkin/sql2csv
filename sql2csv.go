@@ -38,7 +38,10 @@ func (wr CSVWriter) Write(row []interface{}) error {
 	return nil
 }
 
-type SQLReader struct{
+func NewSQLReader(db *sql.DB) SQLReader {
+	return SQLReader{DB: db}
+}
+type SQLReader struct {
 	DB *sql.DB
 }
 
@@ -59,7 +62,7 @@ func (pool SQLReader) Read(ctx context.Context, query string, w CSVWriter) error
 
 	vals := make([]interface{}, len(cols))
 	for i := range vals {
-		vals[i] = &sql.RawBytes{}
+		vals[i] = new(sql.RawBytes)
 	}
 
 	for rows.Next() {
