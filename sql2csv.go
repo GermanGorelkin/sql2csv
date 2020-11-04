@@ -42,7 +42,8 @@ func NewSQLReader(db *sql.DB) SQLReader {
 	return SQLReader{DB: db}
 }
 type SQLReader struct {
-	DB *sql.DB
+	DB      *sql.DB
+	Columns bool
 }
 
 func (pool SQLReader) Read(ctx context.Context, query string, w CSVWriter) error {
@@ -58,6 +59,12 @@ func (pool SQLReader) Read(ctx context.Context, query string, w CSVWriter) error
 	cols, err := rows.Columns()
 	if err != nil {
 		return err
+	}
+
+	if pool.Columns {
+		if err = writeColumns(cols, w); err != nil {
+			return err
+		}
 	}
 
 	vals := make([]interface{}, len(cols))
@@ -81,4 +88,13 @@ func (pool SQLReader) Read(ctx context.Context, query string, w CSVWriter) error
 	}
 
 	return nil
+}
+
+func writeColumns(cols []string, w CSVWriter) error {
+	vals := make([]interface{}, len(cols))
+	for i := range vals {
+		vals[i] = cols[i]
+	}
+
+	return w.Write(vals)
 }
