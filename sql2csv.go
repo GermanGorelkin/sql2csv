@@ -1,6 +1,7 @@
 package sql2csv
 
 import (
+	"bufio"
 	"context"
 	"database/sql"
 	"io"
@@ -10,14 +11,14 @@ func NewCSVWriter(delimiter []byte, nl []byte, w io.Writer) CSVWriter {
 	return CSVWriter{
 		Delimiter: delimiter,
 		NewLine:   nl,
-		w:         w,
+		w:         bufio.NewWriter(w),
 	}
 }
 
 type CSVWriter struct {
 	Delimiter []byte
 	NewLine   []byte
-	w         io.Writer
+	w         *bufio.Writer
 }
 
 func (wr CSVWriter) WriteStrings(cols []string) error {
@@ -112,5 +113,5 @@ func (pool SQLReader) Read(ctx context.Context, query string, w CSVWriter) error
 		return err
 	}
 
-	return nil
+	return w.w.Flush()
 }
