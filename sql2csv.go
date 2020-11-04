@@ -38,6 +38,13 @@ func (wr CSVWriter) Write(row []interface{}) error {
 	return nil
 }
 
+func (wr CSVWriter) AddBOM() error {
+	if _, err := wr.w.Write([]byte{0xEF, 0xBB, 0xBF}); err != nil {
+		return err
+	}
+	return nil
+}
+
 func NewSQLReader(db *sql.DB) SQLReader {
 	return SQLReader{DB: db}
 }
