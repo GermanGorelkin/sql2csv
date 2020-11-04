@@ -20,6 +20,24 @@ type CSVWriter struct {
 	w         io.Writer
 }
 
+func (wr CSVWriter) WriteStrings(cols []string) error {
+	for n, field := range cols {
+		if n > 0 {
+			if _, err := wr.w.Write(wr.Delimiter); err != nil {
+				return err
+			}
+		}
+		if _, err := wr.w.Write([]byte(field)); err != nil {
+			return err
+		}
+	}
+	if _, err := wr.w.Write(wr.NewLine); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (wr CSVWriter) Write(row []interface{}) error {
 	for n, field := range row {
 		if n > 0 {
@@ -69,7 +87,7 @@ func (pool SQLReader) Read(ctx context.Context, query string, w CSVWriter) error
 	}
 
 	if pool.Columns {
-		if err = writeColumns(cols, w); err != nil {
+		if err = w.WriteStrings(cols); err != nil {
 			return err
 		}
 	}
@@ -95,13 +113,4 @@ func (pool SQLReader) Read(ctx context.Context, query string, w CSVWriter) error
 	}
 
 	return nil
-}
-
-func writeColumns(cols []string, w CSVWriter) error {
-	vals := make([]interface{}, len(cols))
-	for i := range vals {
-		vals[i] = cols[i]
-	}
-
-	return w.Write(vals)
 }
