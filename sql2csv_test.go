@@ -3,8 +3,9 @@ package sql2csv
 import (
 	"bytes"
 	"database/sql"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestCSVWriter_Write(t *testing.T) {
@@ -13,9 +14,13 @@ func TestCSVWriter_Write(t *testing.T) {
 
 	err := csvWriter.Write(genRow([]byte{1}, []byte{2}, []byte{3}))
 	assert.Nil(t, err)
+	err = csvWriter.w.Flush()
+	assert.Nil(t, err)
 	assert.Equal(t, w.Bytes(), []byte{1, '|', 2, '|', 3, '\r', '\n'})
 
 	err = csvWriter.Write(genRow([]byte{4}, []byte{5}, []byte{6}))
+	assert.Nil(t, err)
+	err = csvWriter.w.Flush()
 	assert.Nil(t, err)
 	assert.Equal(t, w.Bytes(), []byte{
 		1, '|', 2, '|', 3, '\r', '\n',
