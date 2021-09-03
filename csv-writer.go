@@ -2,7 +2,6 @@ package sql2csv
 
 import (
 	"bufio"
-	"context"
 	"database/sql"
 	"io"
 )
@@ -57,61 +56,13 @@ func (wr CSVWriter) Write(row []interface{}) error {
 	return nil
 }
 
+func (wr CSVWriter) Flush() error {
+	return wr.w.Flush()
+}
+
 func (wr CSVWriter) AddBOM() error {
 	if _, err := wr.w.Write([]byte{0xEF, 0xBB, 0xBF}); err != nil {
 		return err
 	}
 	return nil
-}
-
-func NewSQLReader(db *sql.DB) SQLReader {
-	return SQLReader{DB: db}
-}
-type SQLReader struct {
-	DB      *sql.DB
-	Columns bool
-}
-
-func (pool SQLReader) Read(ctx context.Context, query string, w CSVWriter) error {
-	if err := pool.DB.PingContext(ctx); err != nil {
-		return err
-	}
-
-	rows, err := pool.DB.QueryContext(ctx, query)
-	if err != nil {
-		return err
-	}
-
-	cols, err := rows.Columns()
-	if err != nil {
-		return err
-	}
-
-	if pool.Columns {
-		if err = w.WriteStrings(cols); err != nil {
-			return err
-		}
-	}
-
-	vals := make([]interface{}, len(cols))
-	for i := range vals {
-		vals[i] = new(sql.RawBytes)
-	}
-
-	for rows.Next() {
-		if err = rows.Scan(vals...); err != nil {
-			return err
-		}
-		if err = w.Write(vals); err != nil {
-			return err
-		}
-	}
-	if err = rows.Close(); err != nil {
-		return err
-	}
-	if err = rows.Err(); err != nil {
-		return err
-	}
-
-	return w.w.Flush()
 }
