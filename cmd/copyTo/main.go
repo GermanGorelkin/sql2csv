@@ -3,11 +3,13 @@ package main
 import (
 	"context"
 	"database/sql"
-	_ "github.com/denisenkom/go-mssqldb"
-	"github.com/germangorelkin/sql2csv"
 	"io/ioutil"
 	"log"
 	"os"
+
+	_ "github.com/denisenkom/go-mssqldb"
+
+	"github.com/germangorelkin/sql2csv"
 )
 
 func main() {
